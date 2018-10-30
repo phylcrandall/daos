@@ -148,7 +148,7 @@ pipeline {
                     }
                     steps {
                         runTest stashes: [ 'CentOS-tests', 'CentOS-install', 'CentOS-build-vars' ],
-                                script: 'LD_LIBRARY_PATH=install/lib64:install/lib bash -x utils/run_test.sh --init',
+                                script: 'LD_LIBRARY_PATH=install/lib64:install/lib bash -x utils/run_test.sh --init && echo "run_test.sh exited successfully with ${PIPESTATUS[0]}" || echo "run_test.sh exited failure with ${PIPESTATUS[0]}"',
                               junit_files: null
                     }
                     post {
@@ -204,7 +204,9 @@ pipeline {
                         always {
                             sh '''rm -rf src/tests/ftest/avocado/job-results/*/html/ "Functional"/
                                   mkdir "Functional"/
-                                  mv src/tests/ftest/avocado/job-results/* "Functional"/'''
+                                  ls daos.log* && mv daos.log* "Functional"/ || true
+                                  mv src/tests/ftest/avocado/job-results/* "Functional"/
+                                  ls -l "Functional"/ || true'''
                             junit 'Functional/*/results.xml'
                             archiveArtifacts artifacts: 'Functional/**'
                         }
