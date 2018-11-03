@@ -31,7 +31,7 @@ import ctypes
 import subprocess
 
 from avocado       import Test
-from avocado       import main
+from avocado       import main, skip
 from avocado.utils import process
 
 sys.path.append('./util')
@@ -89,6 +89,7 @@ class IorSingleServer(Test):
         finally:
             ServerUtils.stopServer(hosts=self.hostlist_servers)
 
+    skip("Not building IOR in tests")
     def test_singleserver(self):
         """
         Test IOR with Single Server config.

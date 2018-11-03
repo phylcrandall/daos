@@ -137,15 +137,15 @@ class BadEvictTest(Test):
             POOL.evict()
 
             if expected_result in ['FAIL']:
-                    self.fail("Test was expected to fail but it passed.\n")
+                self.fail("Test was expected to fail but it passed.\n")
 
-        except ValueError as e:
-            print e
+        except ValueError as excpn:
+            print excpn
             print traceback.format_exc()
             if expected_result in ['PASS']:
-                    self.fail("Test was expected to pass but it failed.\n")
-        except Exception as e:
-            self.fail("Daos code segfaulted most likely %s" % e)
+                self.fail("Test was expected to pass but it failed.\n")
+        except Exception as excpn:
+            self.fail("Daos code segfaulted most likely %s" % excpn)
 
 if __name__ == "__main__":
     main()
