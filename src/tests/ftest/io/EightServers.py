@@ -30,10 +30,6 @@ from avocado       import Test
 from avocado       import main, skip
 from avocado.utils import process
 
-sys.path.append('./util')
-sys.path.append('../util')
-sys.path.append('../../../utils/py')
-sys.path.append('./../../utils/py')
 import ServerUtils
 import WriteHostFile
 import IorUtils
