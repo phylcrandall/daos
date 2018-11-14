@@ -76,8 +76,8 @@ def runServer(hostfile, setname, basepath, uri_path=None, env_dict=None):
             for k, v in env_dict.items():
                 os.environ[k] = v
 
-        env_vars = ['CRT_.*', 'DAOS_.*', 'ABT_.*', 'DD_(STDERR|LOG)', 'D_LOG_.*',
-                    'OFI_.*']
+        env_vars = ['CRT_.*', 'DAOS_.*', 'ABT_.*', 'D_LOG_.*',
+                    'DD_(STDERR|LOG|SUBSYS|MASK)', 'OFI_.*']
 
         env_args = []
         for (env_var, env_val) in os.environ.items():
@@ -90,8 +90,7 @@ def runServer(hostfile, setname, basepath, uri_path=None, env_dict=None):
             server_cmd.extend(["--report-uri", uri_path])
         server_cmd.extend(["--hostfile", hostfile, "--enable-recovery"])
         server_cmd.extend(env_args)
-        server_cmd.extend(["-x", "DD_SUBSYS=all", "-x", "DD_MASK=all",
-                           daos_srv_bin, "-g", setname, "-c", "1",
+        server_cmd.extend([daos_srv_bin, "-g", setname, "-c", "1",
                            "-a", basepath + "/install/tmp/",
                            "-d", "/var/run/user/{0}".format(os.geteuid())])
 
