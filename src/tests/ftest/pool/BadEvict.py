@@ -28,12 +28,9 @@ import traceback
 import sys
 import json
 import ctypes
-from avocado import Test, main
+from apricot import Test
+from avocado import main
 
-sys.path.append('../util')
-sys.path.append('../../../utils/py')
-sys.path.append('./util')
-sys.path.append('./../../utils/py')
 
 import ServerUtils
 import WriteHostFile
@@ -44,7 +41,7 @@ class BadEvictTest(Test):
     Tests pool evict calls passing NULL and otherwise inappropriate
     parameters.  This can't be done with daosctl, need to use the python API.
 
-    :avocado: tags=pool,badparam,badevict
+    :avocado: recursive
     """
 
     def setUp(self):

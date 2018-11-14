@@ -27,12 +27,9 @@ import time
 import traceback
 import sys
 import json
-from avocado import Test, main
+from apricot import Test
+from avocado import main
 
-sys.path.append('./util')
-sys.path.append('../util')
-sys.path.append('../../../utils/py')
-sys.path.append('./../../utils/py')
 
 import ServerUtils
 import WriteHostFile
@@ -43,7 +40,7 @@ class Permission(Test):
     Tests DAOS pool permissions while connect, whether
     modifying file with specific permissions work as expected.
 
-    :avocado: tags=pool,permission
+    :avocado: recursive
     """
 
     hostfile = None

@@ -29,13 +29,9 @@ import sys
 import json
 from multiprocessing import Process
 
-from avocado import Test
+from apricot import Test
 from avocado.utils import process
 
-sys.path.append('./util')
-sys.path.append('../util')
-sys.path.append('../../../utils/py')
-sys.path.append('./../../utils/py')
 import ServerUtils
 import WriteHostFile
 import CheckForPool
@@ -83,6 +79,7 @@ class GlobalHandle(Test):
     """
     This class contains tests to verify the ability to share pool
     handles amoung processes.
+    :avocado: recursive
     """
 
     def setUp(self):

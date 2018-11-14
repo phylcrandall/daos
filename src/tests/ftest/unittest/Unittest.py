@@ -23,20 +23,16 @@
 '''
 import sys
 
-sys.path.append('./util')
-sys.path.append('../util')
 
+from apricot       import Test
 from GeneralUtils  import get_file_path
-from avocado       import Test
 from avocado.utils import process
 
 class UnitTest(Test):
     """
     Execute Unit Tests
+    :avocado: recursive
     """
-    def setUp(self):
-        pass
-
     def tearDown(self):
         process.system("rm -f /mnt/daos/*")
 

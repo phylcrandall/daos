@@ -26,7 +26,7 @@ import os
 import traceback
 import sys
 import json
-from avocado       import Test
+from apricot       import Test
 from avocado       import main, skip
 from avocado.utils import process
 
