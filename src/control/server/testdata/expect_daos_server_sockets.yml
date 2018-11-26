@@ -1,9 +1,6 @@
 name: daos
-format: thrash
-
-name: daos
 servers:
-- rank: 0
+- rank: ""
   cpus:
   - 1-8
   fabric_iface: eth0
@@ -17,11 +14,12 @@ servers:
   - FI_SOCKETS_MAX_CONN_RETRY=1
   - FI_SOCKETS_CONN_TIMEOUT=2000
   scm_mount: /mnt/daos/1
-  bdev_class: thrash
+  bdev_class: file
   bdev_list:
   - /tmp/daos-bdev
   bdev_number: 0
   bdev_size: 16
+  cliopts: []
 provider: ofi+sockets
 socket_dir: /tmp/daos_sockets
 auto: true
