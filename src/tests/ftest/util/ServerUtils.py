@@ -58,6 +58,10 @@ def runServer(hostfile, setname, basepath, uri_path=None, env_dict=None):
         # first make sure there are no existing servers running
         killServer(servers)
 
+        # clean /mnt/daos/* on all servers
+        for server in servers:
+            subprocess.call(["ssh", server, "rm -rf /mnt/daos/*"])
+
         # pile of build time variables
         with open(os.path.join(basepath, ".build_vars.json")) as json_vars:
             build_vars = json.load(json_vars)
