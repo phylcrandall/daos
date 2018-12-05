@@ -70,7 +70,7 @@ pipeline {
                         }
                     }
                     steps {
-                        sconsBuild()
+                        sconsBuild clean: "_build.external"
                         stash name: 'CentOS-install', includes: 'install/**'
                         stash name: 'CentOS-build-vars', includes: '.build_vars.*'
                         stash name: 'CentOS-tests', includes: 'build/src/rdb/raft/src/tests_main, build/src/common/tests/btree_direct, build/src/common/tests/btree, src/common/tests/btree.sh, build/src/common/tests/sched, build/src/client/api/tests/eq_tests, src/vos/tests/evt_ctl.sh, build/src/vos/vea/tests/vea_ut, src/rdb/raft_tests/raft_tests.py'
@@ -111,7 +111,7 @@ pipeline {
                         }
                     }
                     steps {
-                        sconsBuild()
+                        sconsBuild clean: "_build.external"
                     }
                     post {
                         always {
