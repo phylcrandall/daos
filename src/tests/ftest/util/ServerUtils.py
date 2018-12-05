@@ -73,33 +73,31 @@ def runServer(hostfile, setname, basepath, uri_path=None, env_dict=None):
         env_vars = ['CRT_.*', 'DAOS_.*', 'ABT_.*', 'DD_(STDERR|LOG)', 'D_LOG_.*',
                     'OFI_.*']
 
-        env_args = ""
+        env_args = []
         for (env_var, env_val) in os.environ.items():
             for pat in env_vars:
                 if re.match(pat, env_var):
-                    env_args += "-x {}='{}' ".format(env_var, env_val)
+                    env_args.extend(["-x", "{}={}".format(env_var, env_val)])
 
-        server_cmd = orterun_bin + " --np {0} ".format(server_count)
+        server_cmd = [orterun_bin, "--np", str(server_count)]
         if uri_path is not None:
-            server_cmd += "--report-uri {0} ".format(uri_path)
-        server_cmd += "--hostfile {0} --enable-recovery ".format(hostfile)
-        server_cmd += env_args
-        server_cmd += "-x DD_SUBSYS=all -x DD_MASK=all "
-        server_cmd += daos_srv_bin + " -g {0} -c 1 ".format(setname)
-        server_cmd += " -a " + basepath + "/install/tmp/"
-        server_cmd += " -d " + "/var/run/user/{0}".format(os.geteuid())
+            server_cmd.extend(["--report-uri", uri_path])
+        server_cmd.extend(["--hostfile", hostfile, "--enable-recovery"])
+        server_cmd.extend(env_args)
+        server_cmd.extend(["-x", "DD_SUBSYS=all", "-x", "DD_MASK=all",
+                           daos_srv_bin, "-g", setname, "-c", "1",
+                           "-a", basepath + "/install/tmp/",
+                           "-d", "/var/run/user/{0}".format(os.geteuid())])
 
-        print "Start CMD>>>>{0}".format(server_cmd)
+        print "Start CMD>>>>{0}".format(' '.join(server_cmd))
 
         resource.setrlimit(
             resource.RLIMIT_CORE,
             (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
 
-        # TODO: remove shell=True and split server_cmd into a list
         sessions[setname] = subprocess.Popen(server_cmd,
                                              stdout=subprocess.PIPE,
-                                             stderr=subprocess.PIPE,
-                                             shell=True)
+                                             stderr=subprocess.PIPE)
         fd = sessions[setname].stdout.fileno()
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
