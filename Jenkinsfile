@@ -71,9 +71,24 @@ pipeline {
                     }
                     steps {
                         sconsBuild clean: "_build.external"
+                        sh 'ls -l install/bin/'
                         stash name: 'CentOS-install', includes: 'install/**'
                         stash name: 'CentOS-build-vars', includes: '.build_vars.*'
-                        stash name: 'CentOS-tests', includes: 'build/src/rdb/raft/src/tests_main, build/src/common/tests/btree_direct, build/src/common/tests/btree, src/common/tests/btree.sh, build/src/common/tests/sched, build/src/client/api/tests/eq_tests, src/vos/tests/evt_ctl.sh, build/src/vos/vea/tests/vea_ut, src/rdb/raft_tests/raft_tests.py'
+                        stash name: 'CentOS-tests',
+                                    includes: '''build/src/rdb/raft/src/tests_main,
+                                                 build/src/common/tests/btree_direct,
+                                                 build/src/common/tests/btree,
+                                                 build/src/common/tests/sched,
+                                                 build/src/common/tests/drpc_tests
+                                                 build/src/control/src/github.com/daos-stack/daos/src/control/mgmt,
+                                                 build/src/client/api/tests/eq_tests,
+                                                 build/src/security/tests/cli_security_tests,
+                                                 build/src/vos/vea/tests/vea_ut,
+                                                 src/common/tests/btree.sh,
+                                                 src/control/run_go_tests.sh,
+                                                 src/rdb/raft_tests/raft_tests.py,
+                                                 src/vos/tests/evt_ctl.sh'''
+
                     }
                     post {
                         always {
@@ -148,7 +163,7 @@ pipeline {
                     }
                     steps {
                         runTest stashes: [ 'CentOS-tests', 'CentOS-install', 'CentOS-build-vars' ],
-                                script: 'LD_LIBRARY_PATH=install/lib64:install/lib bash -x utils/run_test.sh --init && echo "run_test.sh exited successfully with ${PIPESTATUS[0]}" || echo "run_test.sh exited failure with ${PIPESTATUS[0]}"',
+                                script: 'ls -l install/bin/; LD_LIBRARY_PATH=install/lib64:install/lib bash -x utils/run_test.sh --init && echo "run_test.sh exited successfully with ${PIPESTATUS[0]}" || echo "run_test.sh exited failure with ${PIPESTATUS[0]}"',
                               junit_files: null
                     }
                     post {
