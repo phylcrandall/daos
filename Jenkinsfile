@@ -1,6 +1,6 @@
 // To use a test branch (i.e. PR) until it lands to master
 // I.e. for testing library changes
-@Library(value="pipeline-lib@debug") _
+@Library(value="pipeline-lib@jemalmbe_ljbtest") _
 
 pipeline {
     agent any
@@ -155,7 +155,8 @@ pipeline {
                 }
             }
         }
-        stage('Unit Test') {
+// temp skip Unit test to speed up testing.
+/*        stage('Unit Test') {
             parallel {
                 stage('run_test.sh') {
                     agent {
@@ -167,7 +168,7 @@ pipeline {
                               junit_files: null
                     }
                     post {
-                        /* temporarily moved into runTest->stepResult due to JENKINS-39203
+*/                        /* temporarily moved into runTest->stepResult due to JENKINS-39203
                         success {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'run_test.sh',  context: 'test/run_test.sh', status: 'SUCCESS'
                         }
@@ -178,7 +179,7 @@ pipeline {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'run_test.sh',  context: 'test/run_test.sh', status: 'ERROR'
                         }
                         */
-                        always {
+/*                        always {
                             sh '''rm -rf run_test.sh/
                                   mkdir run_test.sh/
                                   [ -f /tmp/daos.log ] && mv /tmp/daos.log run_test.sh/ || true'''
@@ -188,23 +189,36 @@ pipeline {
                 }
             }
         }
+*/
         stage('Test') {
             parallel {
                 stage('Functional') {
                     agent {
-                        label 'cluster_provisioner'
+                        label 'ci_vm8'
                     }
                     steps {
-                        runTest stashes: [ 'CentOS-install', 'CentOS-build-vars' ],
-                                script: '''rm -f src/test/ftest/core.[0-9]*
-                                           test_tag=$(git show -s --format=%B | sed -ne "/^Test-tag:/s/^.*: *//p")
-                                           if [ -z "$test_tag" ]; then
-                                               test_tag=regression
-                                           fi
-                                           bash ftest.sh "$test_tag"; echo "rc: $?"''',
-                                junit_files: "src/tests/ftest/avocado/job-results/*/*.xml"
-                    }
-                    post {
+                      // Need the jenkins module for provisioning
+                      checkoutScm url: 'ssh://review.hpdd.intel.com:29418/exascale/jenkins',
+                                  checkoutDir: 'jenkins',
+                                  credentialsId: 'daos-gerrit-read'
+                      echo "Functional test, checked out exascale/jenkins"
+                      sshagent (credentials: ['daos-provisioner']) {
+                        echo "Functional teset, using sshagent"
+                        sh script: 'ssh autotest@autotest-1 hostname'
+                        sh script: """./jenkins/test_manager/node_provision_start.py \
+                                       --nodes=${env.NODELIST}""",
+                           returnStatus: true
+                      } //sshagent
+//                       runTest stashes: [ 'CentOS-install', 'CentOS-build-vars' ],
+//                                script: '''rm -f src/test/ftest/core.[0-9]*
+//                                           test_tag=$(git show -s --format=%B | sed -ne "/^Test-tag:/s/^.*: *//p")
+//                                           if [ -z "$test_tag" ]; then
+//                                               test_tag=regression
+//                                           fi
+//                                           bash ftest.sh "$test_tag"; echo "rc: $?"''',
+//                                junit_files: "src/tests/ftest/avocado/job-results/*/*.xml"
+                    } // steps
+//                    post {
                         /* temporarily moved into runTest->stepResult due to JENKINS-39203
                         success {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'Functional',  context: 'test/functional', status: 'SUCCESS'
@@ -216,17 +230,17 @@ pipeline {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'Functional',  context: 'test/functional', status: 'ERROR'
                         }
                         */
-                        always {
-                            sh '''rm -rf src/tests/ftest/avocado/job-results/*/html/ "Functional"/
-                                  mkdir "Functional"/
-                                  ls daos.log* && mv daos.log* "Functional"/ || true
-                                  mv src/tests/ftest/avocado/job-results/* "Functional"/
-                                  ls -l "Functional"/ || true'''
-                            junit 'Functional/*/results.xml'
-                            archiveArtifacts artifacts: 'Functional/**'
-                        }
-                    }
-                }
+//                        always {
+//                            sh '''rm -rf src/tests/ftest/avocado/job-results/*/html/ "Functional"/
+//                                  mkdir "Functional"/
+//                                  ls daos.log* && mv daos.log* "Functional"/ || true
+//                                  mv src/tests/ftest/avocado/job-results/* "Functional"/
+//                                  ls -l "Functional"/ || true'''
+//                            junit 'Functional/*/results.xml'
+//                            archiveArtifacts artifacts: 'Functional/**'
+//                        }
+//                    } // post
+                } // stage('Functional')
             }
         }
     }
