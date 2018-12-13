@@ -54,7 +54,7 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+/*        stage('Build') {
             // abort other builds if/when one fails to avoid wasting time
             // and resources
             failFast true
@@ -102,7 +102,7 @@ pipeline {
                                          filters: [excludeFile('.*\\/_build\\.external\\/.*'),
                                                    excludeFile('_build\\.external\\/.*')]
                         }
-                        /* temporarily moved into stepResult due to JENKINS-39203
+ */                       /* temporarily moved into stepResult due to JENKINS-39203
                         success {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'CentOS 7 Build',  context: 'build/centos7', status: 'SUCCESS'
                         }
@@ -113,7 +113,7 @@ pipeline {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'CentOS 7 Build',  context: 'build/centos7', status: 'ERROR'
                         }
                         */
-                    }
+ /*                   }
                 }
                 stage('Build on Ubuntu 18.04') {
                     agent {
@@ -140,7 +140,7 @@ pipeline {
                                          filters: [excludeFile('.*\\/_build\\.external\\/.*'),
                                                    excludeFile('_build\\.external\\/.*')]
                         }
-                        /* temporarily moved into stepResult due to JENKINS-39203
+*/                        /* temporarily moved into stepResult due to JENKINS-39203
                         success {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'Ubuntu 18 Build',  context: 'build/ubuntu18', status: 'SUCCESS'
                         }
@@ -151,10 +151,11 @@ pipeline {
                             githubNotify credentialsId: 'daos-jenkins-commit-status', description: 'Ubuntu 18 Build',  context: 'build/ubuntu18', status: 'ERROR'
                         }
                         */
-                    }
+/*                    }
                 }
             }
         }
+*/
 // temp skip Unit test to speed up testing.
 /*        stage('Unit Test') {
             parallel {
@@ -198,17 +199,22 @@ pipeline {
                     }
                     steps {
                       // Need the jenkins module for provisioning
-                      checkoutScm url: 'ssh://review.hpdd.intel.com:29418/exascale/jenkins',
-                                  checkoutDir: 'jenkins',
-                                  credentialsId: 'daos-gerrit-read'
-                      echo "Functional test, checked out exascale/jenkins"
-                      sshagent (credentials: ['daos-provisioner']) {
-                        echo "Functional teset, using sshagent"
-                        sh script: 'ssh autotest@autotest-1 hostname'
-                        sh script: """./jenkins/test_manager/node_provision_start.py \
-                                       --nodes=${env.NODELIST}""",
-                           returnStatus: true
-                      } //sshagent
+                      //checkoutScm url: 'ssh://review.hpdd.intel.com:29418/exascale/jenkins',
+                      //            checkoutDir: 'jenkins',
+                      //            credentialsId: 'daos-gerrit-read'
+                      //echo "Functional test, checked out exascale/jenkins"
+                      //sshagent (credentials: ['daos-provisioner']) {
+                      //  echo "Functional teset, using sshagent"
+                      //  sh script: 'ssh autotest@autotest-1 hostname'
+                      //  requestNodes clients: 4, NODELIST: "${env.NODELIST}"
+                      //  sh script: """./jenkins/test_manager/node_provision_start.py \
+                      //                 --nodes=${requestNodes.nodeString} --snapshot""",
+                      //     returnStatus: true
+                      //} //sshagent
+                      provisionNodes NODELIST: "${env.NODELIST}",
+                                     node_count: 2,
+                                     distro: 'el7',
+                                     power_only: true
 //                       runTest stashes: [ 'CentOS-install', 'CentOS-build-vars' ],
 //                                script: '''rm -f src/test/ftest/core.[0-9]*
 //                                           test_tag=$(git show -s --format=%B | sed -ne "/^Test-tag:/s/^.*: *//p")
