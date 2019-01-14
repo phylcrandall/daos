@@ -185,6 +185,22 @@ pipeline {
                                          status: 'ERROR'
                         }
                         */
+                        unstable {
+                            recordIssues enabledForFailure: true,
+                                         aggregatingResults: true,
+                                         id: "analysis-centos7",
+                                         tools: [ gcc4(), cppCheck() ],
+                                         filters: [excludeFile('.*\\/_build\\.external\\/.*'),
+                                                   excludeFile('_build\\.external\\/.*')]
+                        }
+                        failure {
+                            recordIssues enabledForFailure: true,
+                                         aggregatingResults: true,
+                                         id: "analysis-centos7",
+                                         tools: [ gcc4(), cppCheck() ],
+                                         filters: [excludeFile('.*\\/_build\\.external\\/.*'),
+                                                   excludeFile('_build\\.external\\/.*')]
+                        }
                     }
                 }
                 stage('Build on CentOS 7 with Clang') {
