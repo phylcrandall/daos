@@ -44,6 +44,7 @@ class DaosCoreTest(Test):
     Runs the daos_test subtests with multiple servers.
 
     """
+    # pylint: disable=too-many-instance-attributes
     subtest_name = None
 
     def setUp(self):
@@ -84,7 +85,7 @@ class DaosCoreTest(Test):
             except KeyError:
                 pass
 
-    def _run_test(self, subtest, num_clients=None, num_replicas=None):
+    def _run_test(self, subtest, opts="", num_clients=None, num_replicas=None):
         if not num_clients:
             num_clients = self.params.get("num_clients",
                                           '/run/daos_tests/num_clients/*')
@@ -92,9 +93,9 @@ class DaosCoreTest(Test):
             num_replicas = self.params.get("num_replicas",
                                            '/run/daos_tests/num_replicas/*')
 
-        cmd = "{0} -n {1} {2} -s {3} -{4}".format(self.orterun, num_clients,
-                                                  self.daos_test, num_replicas,
-                                                  subtest)
+        cmd = "{0} -n {1} {2} -s {3} -{4} {5}".format(self.orterun, num_clients,
+                                                      self.daos_test, num_replicas,
+                                                      subtest, opts)
 
         env = {}
         env['CMOCKA_XML_FILE'] = self.tmp + "/%g_results.xml"
@@ -124,6 +125,7 @@ class DaosCoreTest(Test):
                           .format(cmd, result.result.exit_status))
 
     def test_rebuild(self):
+        # pylint: disable=fixme
         # TODO: should actually put this one into the mux and check the
         #       servers for memory and cancel out/skip the test if there
         #       is not enough rather than just assuming VMs don't have
@@ -136,11 +138,11 @@ class DaosCoreTest(Test):
 
         Use Cases: core tests for daos_test
 
-        :avocado: tags=daos_test,multiserver,hardware,regression
+        :avocado: tags=daos_test,multiserver,vm,regression
         """
 
         self.subtest_name = "rebuild tests"
-        self._run_test("r")
+        self._run_test("r", opts="-u subtests=\"0-13\"")
 
     def test_subtest(self):
         """
